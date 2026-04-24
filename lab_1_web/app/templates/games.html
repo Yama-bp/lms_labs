@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Мобильные игры - Игры</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .nav { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .nav a:hover { 
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+        
+        .nav a.active {
+            background: rgba(255,255,255,0.3);
+            font-weight: bold;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 2rem;
+            text-align: center;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            color: #667eea;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            border-bottom: 3px solid #f0f0f0;
+            padding-bottom: 0.5rem;
+        }
+        
+        .stats-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-left: 1rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+            background: white;
+        }
+        
+        tr:hover td {
+            background: #f8f9ff;
+        }
+        
+        .publisher-badge {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+        
+        .game-count {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <div class="nav-container">
+            <a href="/">🏠 Главная</a>
+            <a href="/games" class="active">🎮 Игры</a>
+            <a href="/publishers">🏢 Издатели</a>
+            <a href="/queries">📊 Аналитика</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>🎮 Все игры</h1>
+        
+        <div class="section">
+            <div class="section-title">
+                📋 Детальный список игр
+                <span class="stats-badge">Всего: {{ games|length }}</span>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Название</th>
+                        <th>Дата выхода</th>
+                        <th>Дата статистики</th>
+                        <th>Популярность</th>
+                        <th>Тип</th>
+                        <th>Издатель</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for game in games %}
+                    <tr>
+                        <td>#{{ game.id }}</td>
+                        <td><strong>{{ game.title }}</strong></td>
+                        <td>{{ game.release_date }}</td>
+                        <td>{{ game.as_of_date }}</td>
+                        <td><span class="game-count">{{ game.player_count }}M</span></td>
+                        <td><span class="publisher-badge">{{ game.player_count_type }}</span></td>
+                        <td>
+                            {% for gp in game.game_publishers %}
+                                <span class="publisher-badge">{{ gp.publisher.name }}</span>
+                                {% if not loop.last %} / {% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="footer">
+        🎮 База данных популярных мобильных игр | Данные актуальны на 2025 год
+    </div>
+</body>
+</html>

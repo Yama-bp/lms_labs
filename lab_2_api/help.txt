@@ -1,0 +1,19 @@
+# 1 ЗАДАНИЕ
+# GET (список) - получить все игры
+curl http://127.0.0.1:5001/api/v1/games/
+
+# GET (одна запись) - получить игру с id=1
+curl http://127.0.0.1:5001/api/v1/games/1
+
+# POST (создание) - добавить новую игру (с аутентификацией)
+curl -u student:dvfu -X POST -H "Content-Type:application/json" \
+--data '{"title":"Моя новая игра","player_count":500,"player_count_type":"daily players","release_date":"2024","as_of_date":"2024"}' \
+http://127.0.0.1:5001/api/v1/games/
+
+# PUT (обновление) - изменить название игры с id=1
+curl -u student:dvfu -X PUT -H "Content-Type:application/json" \
+--data '{"title":"Обновленное название"}' \
+http://127.0.0.1:5001/api/v1/games/1
+
+# DELETE (удаление) - удалить игру с id=54 (если создали новую)
+curl -u student:dvfu -X DELETE http://127.0.0.1:5001/api/v1/games/54
