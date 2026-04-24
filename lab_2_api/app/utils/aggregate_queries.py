@@ -69,19 +69,19 @@ def get_stat_by_type():
 
 # 3 группировка по годам (макс, мин, среднее)
 def get_stat_by_year():
-    """Статистика по годам выпуска: средняя, максимальная, минимальная популярность"""
+    """Статистика по годам выпуска (извлекаем год из строки с датой)"""
     results = (
         db.session.query(
-            Game.release_date.label("name"),
+            # Извлекаем последние 4 цифры из строки даты (год)
+            func.substr(Game.release_date, -4, 4).label("name"),
             func.avg(Game.player_count).label("avg_popularity"),
             func.max(Game.player_count).label("max_popularity"),
             func.min(Game.player_count).label("min_popularity"),
             func.count(Game.id).label("count")
         )
         .filter(Game.release_date != None, Game.release_date != '')
-        .group_by(Game.release_date)
-        .order_by(Game.release_date)
-        .limit(20)
+        .group_by("name")
+        .order_by("name")  # сортируем по годам
         .all()
     )
     return [{"name": r.name, 
