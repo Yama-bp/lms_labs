@@ -1,0 +1,63 @@
+import React from 'react';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import { styled } from '@mui/material/styles';
+
+const StyledTypography = styled(Typography)(({ theme }) => ({
+  color: theme.palette.text.secondary,
+  textAlign: 'justify',
+  marginBottom: theme.spacing(1),
+}));
+
+interface ComponentProps {
+  building: {
+    img: string;
+    title: string;
+    description: string[];
+  };
+  index: number;
+}
+
+function BuildCard({ building, index }: ComponentProps) {
+  return (
+    <Card
+      sx={{
+        display: 'flex',
+        flexDirection: index % 2 === 0 ? 'row' : 'row-reverse',
+      }}
+    >
+      <CardMedia
+        component="img"
+        alt={building.title}
+        image={building.img}
+        sx={{ width: '50%', objectFit: 'cover' }}
+      />
+      <Box sx={{ display: 'flex', flexDirection: 'column', width: '50%' }}>
+        <CardContent>
+          <Typography gutterBottom variant="h5" component="div">
+            {building.title}
+          </Typography>
+          {building.description.map((item, idx) => (
+            <StyledTypography key={idx} variant="body2">
+              {item}
+            </StyledTypography>
+          ))}
+        </CardContent>
+        <CardActions
+          sx={{
+            justifyContent: index % 2 === 0 ? 'flex-end' : 'flex-start',
+          }}
+        >
+          <Button size="small">Подробнее</Button>
+        </CardActions>
+      </Box>
+    </Card>
+  );
+}
+
+export default BuildCard;
