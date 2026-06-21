@@ -1,10 +1,9 @@
 import * as React from 'react';
 import { BarChart, LineChart } from '@mui/x-charts';
 import Container from '@mui/material/Container';
-import { tGroup } from "../groupdata";
 import SettingChart from "./SettingChart";
 
-type GroupProps = { data: tGroup; };
+type GroupProps = { data: any[]; };
 
 type tSeries = {
   'Максимальная популярность': boolean;
@@ -31,10 +30,10 @@ function GroupChart({ data }: GroupProps) {
     <Container maxWidth="lg">
       <SettingChart series={series} setSeries={setSeries} isBar={isBar} setIsBar={setIsBar} />
       {isBar ? (
-        <BarChart dataset={data} xAxis={[{ scaleType: 'band', dataKey: 'Группа' }]}
+        <BarChart dataset={data as any} xAxis={[{ scaleType: 'band', dataKey: 'Группа' }]}
           series={seriesY.map(s => ({ ...s, barLabel }))} {...chartSetting} />
       ) : (
-        <LineChart dataset={data} xAxis={[{ scaleType: 'band', dataKey: 'Группа' }]} series={seriesY} {...chartSetting} />
+        <LineChart dataset={data as any} xAxis={[{ scaleType: 'band', dataKey: 'Группа' }]} series={seriesY} {...chartSetting} />
       )}
     </Container>
   );

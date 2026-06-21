@@ -3,7 +3,8 @@ from app.models.game import Game
 from app.models.publisher import Publisher
 from app.models.game_publisher import GamePublisher
 from structures.extension import db
-from app.schemas.game import game_schema, games_schema
+from app.schemas.game import game_schema, games_schema, publisher_schema, publishers_schema
+import traceback
 
 games_bp = Blueprint('games', __name__)
 
@@ -20,10 +21,11 @@ def get_games():
     if search:
         query = query.filter(Game.title.ilike(f'%{search}%'))
     
-    if sort_dir == 'desc':
-        query = query.order_by(getattr(Game, sort_by).desc())
+    if hasattr(Game, sort_by):
+        col = getattr(Game, sort_by)
+        query = query.order_by(col.desc() if sort_dir == 'desc' else col.asc())
     else:
-        query = query.order_by(getattr(Game, sort_by).asc())
+        query = query.order_by(Game.id.asc())
     
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     
@@ -46,6 +48,8 @@ def get_game(id):
 def create_game():
     try:
         data = request.get_json()
+        print("POST data:", data)
+        
         game = Game(
             title=data['title'],
             release_year=data.get('release_year'),
@@ -57,15 +61,25 @@ def create_game():
         db.session.add(game)
         db.session.flush()
         
-        publisher_ids = data.get('publisher_ids', [])
-        for pub_id in publisher_ids:
-            gp = GamePublisher(game_id=game.id, publisher_id=pub_id)
-            db.session.add(gp)
+        publisher_names = data.get('publishers', [])
+        print("Publishers:", publisher_names)
+        
+        for pub_name in publisher_names:
+            if pub_name and pub_name.strip():
+                publisher = Publisher.query.filter_by(name=pub_name.strip()).first()
+                if not publisher:
+                    publisher = Publisher(pub_name.strip())
+                    db.session.add(publisher)
+                    db.session.flush()
+                gp = GamePublisher(game_id=game.id, publisher_id=publisher.id)
+                db.session.add(gp)
         
         db.session.commit()
         return jsonify({"success": True, "game": game_schema.dump(game)}), 201
     except Exception as e:
         db.session.rollback()
+        print("ERROR:", str(e))
+        traceback.print_exc()
         return jsonify({"success": False, "error": str(e)}), 500
 
 @games_bp.route('/<int:id>', methods=['PUT'])
@@ -78,10 +92,25 @@ def update_game(id):
         for field in ['title', 'release_year', 'player_count', 'count_type', 'description', 'image_url']:
             if field in data:
                 setattr(game, field, data[field])
+        
+        if 'publishers' in data:
+            GamePublisher.query.filter_by(game_id=id).delete()
+            for pub_name in data['publishers']:
+                if pub_name and pub_name.strip():
+                    publisher = Publisher.query.filter_by(name=pub_name.strip()).first()
+                    if not publisher:
+                        publisher = Publisher(pub_name.strip())
+                        db.session.add(publisher)
+                        db.session.flush()
+                    gp = GamePublisher(game_id=game.id, publisher_id=publisher.id)
+                    db.session.add(gp)
+        
         db.session.commit()
         return jsonify({"success": True, "game": game_schema.dump(game)}), 200
     except Exception as e:
         db.session.rollback()
+        print("ERROR:", str(e))
+        traceback.print_exc()
         return jsonify({"success": False, "error": str(e)}), 500
 
 @games_bp.route('/<int:id>', methods=['DELETE'])
@@ -96,4 +125,6 @@ def delete_game(id):
         return jsonify({"success": True}), 200
     except Exception as e:
         db.session.rollback()
+        print("ERROR:", str(e))
+        traceback.print_exc()
         return jsonify({"success": False, "error": str(e)}), 500

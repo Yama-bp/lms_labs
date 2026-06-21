@@ -1,9 +1,8 @@
 import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
 import { ruRU } from '@mui/x-data-grid/locales';
 import Container from '@mui/material/Container';
-import { tGroup } from "../groupdata";
 
-type GroupProps = { data: tGroup; };
+type GroupProps = { data: any[]; };
 
 function GroupGrid({ data }: GroupProps) {
   const rows: GridRowsProp = data;
